@@ -97,4 +97,4 @@ impl NLLBLanguages {
     ];
 }
 
-pub type NLLBGenerator = M2M100Generator;
+pub type NLLBGenerator<'a> = M2M100Generator<'a>;

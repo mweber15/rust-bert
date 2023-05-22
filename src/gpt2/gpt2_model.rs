@@ -570,11 +570,11 @@ pub struct Gpt2ModelOutput {
 }
 
 /// # Language generation model based on the GPT2 architecture
-pub struct GPT2Generator {
+pub struct GPT2Generator<'a> {
     model: GPT2LMHeadModel,
     tokenizer: TokenizerOption,
     var_store: nn::VarStore,
-    generate_config: GenerateConfig,
+    generate_config: GenerateConfig<'a>,
     bos_token_id: Option<i64>,
     eos_token_ids: Option<Vec<i64>>,
     pad_token_id: Option<i64>,
@@ -584,7 +584,7 @@ pub struct GPT2Generator {
     max_position_embeddings: i64,
 }
 
-impl GPT2Generator {
+impl GPT2Generator<'_> {
     /// Build a new `GPT2Generator`
     ///
     /// # Arguments
@@ -672,7 +672,7 @@ impl GPT2Generator {
     }
 }
 
-impl PrivateLanguageGenerator for GPT2Generator {
+impl PrivateLanguageGenerator for GPT2Generator<'_> {
     fn _get_tokenizer(&self) -> &TokenizerOption {
         &self.tokenizer
     }
@@ -815,4 +815,4 @@ impl PrivateLanguageGenerator for GPT2Generator {
     }
 }
 
-impl LanguageGenerator for GPT2Generator {}
+impl LanguageGenerator for GPT2Generator<'_> {}

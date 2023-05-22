@@ -831,11 +831,11 @@ pub struct ProphetNetGenerationOutput {
 }
 
 /// # Language generation model based on the ProphetNet architecture
-pub struct ProphetNetConditionalGenerator {
+pub struct ProphetNetConditionalGenerator<'a> {
     model: ProphetNetForConditionalGeneration,
     tokenizer: TokenizerOption,
     var_store: nn::VarStore,
-    generate_config: GenerateConfig,
+    generate_config: GenerateConfig<'a>,
     bos_token_id: Option<i64>,
     eos_token_ids: Option<Vec<i64>>,
     pad_token_id: Option<i64>,
@@ -845,7 +845,7 @@ pub struct ProphetNetConditionalGenerator {
     max_position_embeddings: i64,
 }
 
-impl ProphetNetConditionalGenerator {
+impl ProphetNetConditionalGenerator<'_> {
     /// Build a new `ProphetNetConditionalGenerator`
     ///
     /// # Arguments
@@ -938,7 +938,7 @@ impl ProphetNetConditionalGenerator {
     }
 }
 
-impl PrivateLanguageGenerator for ProphetNetConditionalGenerator {
+impl PrivateLanguageGenerator for ProphetNetConditionalGenerator<'_> {
     fn _get_tokenizer(&self) -> &TokenizerOption {
         &self.tokenizer
     }
@@ -1138,4 +1138,4 @@ impl PrivateLanguageGenerator for ProphetNetConditionalGenerator {
     }
 }
 
-impl LanguageGenerator for ProphetNetConditionalGenerator {}
+impl LanguageGenerator for ProphetNetConditionalGenerator<'_> {}

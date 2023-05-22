@@ -428,11 +428,11 @@ impl PegasusForConditionalGeneration {
 }
 
 /// # Language generation model based on the Pegasus architecture
-pub struct PegasusConditionalGenerator {
+pub struct PegasusConditionalGenerator<'a> {
     model: PegasusForConditionalGeneration,
     tokenizer: TokenizerOption,
     var_store: nn::VarStore,
-    generate_config: GenerateConfig,
+    generate_config: GenerateConfig<'a>,
     bos_token_id: Option<i64>,
     eos_token_ids: Option<Vec<i64>>,
     pad_token_id: Option<i64>,
@@ -442,7 +442,7 @@ pub struct PegasusConditionalGenerator {
     max_position_embeddings: i64,
 }
 
-impl PegasusConditionalGenerator {
+impl PegasusConditionalGenerator<'_> {
     /// Build a new `PegasusGenerator`
     ///
     /// # Arguments
@@ -548,7 +548,7 @@ impl PegasusConditionalGenerator {
     }
 }
 
-impl PrivateLanguageGenerator for PegasusConditionalGenerator {
+impl PrivateLanguageGenerator for PegasusConditionalGenerator<'_> {
     fn _get_tokenizer(&self) -> &TokenizerOption {
         &self.tokenizer
     }
@@ -757,7 +757,7 @@ impl PrivateLanguageGenerator for PegasusConditionalGenerator {
     }
 }
 
-impl LanguageGenerator for PegasusConditionalGenerator {}
+impl LanguageGenerator for PegasusConditionalGenerator<'_> {}
 
 /// Container holding a Pegasus model output. The decoder output may hold the hidden state of
 /// the last layer of the decoder, or may hold logits for a custom head module after the

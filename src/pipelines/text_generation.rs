@@ -160,8 +160,8 @@ impl Default for TextGenerationConfig {
     }
 }
 
-impl From<TextGenerationConfig> for GenerateConfig {
-    fn from(config: TextGenerationConfig) -> GenerateConfig {
+impl<'a> From<TextGenerationConfig> for GenerateConfig<'a> {
+    fn from(config: TextGenerationConfig) -> GenerateConfig<'a> {
         GenerateConfig {
             model_resource: config.model_resource,
             config_resource: config.config_resource,
@@ -187,24 +187,24 @@ impl From<TextGenerationConfig> for GenerateConfig {
 }
 
 /// # Abstraction that holds one particular text generation model, for any of the supported models
-pub enum TextGenerationOption {
+pub enum TextGenerationOption<'a> {
     /// Text Generator based on GPT2 model
-    GPT2(GPT2Generator),
+    GPT2(GPT2Generator<'a>),
     /// Text Generator based on GPT model
-    GPT(OpenAIGenerator),
+    GPT(OpenAIGenerator<'a>),
     /// Text Generator based on GPT-Neo model
-    GPTNeo(GptNeoGenerator),
+    GPTNeo(GptNeoGenerator<'a>),
     /// Text Generator based on GPT-J model
-    GPTJ(GptJGenerator),
+    GPTJ(GptJGenerator<'a>),
     /// Text Generator based on XLNet model
-    XLNet(XLNetGenerator),
+    XLNet(XLNetGenerator<'a>),
     /// Text Generator based on Reformer model
-    Reformer(ReformerGenerator),
+    Reformer(ReformerGenerator<'a>),
     /// Text Generator based on T5 model
-    T5(T5Generator),
+    T5(T5Generator<'a>),
 }
 
-impl TextGenerationOption {
+impl TextGenerationOption<'_> {
     pub fn new(config: TextGenerationConfig) -> Result<Self, RustBertError> {
         match config.model_type {
             ModelType::GPT2 => Ok(TextGenerationOption::GPT2(GPT2Generator::new(
@@ -398,15 +398,15 @@ impl TextGenerationOption {
 }
 
 /// # TextGenerationModel to generate texts from a prompt
-pub struct TextGenerationModel {
-    model: TextGenerationOption,
+pub struct TextGenerationModel<'a> {
+    model: TextGenerationOption<'a>,
     prefix: Option<String>,
     prefix_length: Option<i64>,
     min_length: i64,
     max_length: Option<i64>,
 }
 
-impl TextGenerationModel {
+impl<'a> TextGenerationModel<'a> {
     /// Build a new `TextGenerationModel`
     ///
     /// # Arguments
@@ -426,7 +426,7 @@ impl TextGenerationModel {
     /// ```
     pub fn new(
         generation_config: TextGenerationConfig,
-    ) -> Result<TextGenerationModel, RustBertError> {
+    ) -> Result<TextGenerationModel<'a>, RustBertError> {
         let (prefix, min_length, max_length) =
             TextGenerationModel::get_prefix_min_max_length(&generation_config);
         let model = TextGenerationOption::new(generation_config)?;
@@ -471,7 +471,7 @@ impl TextGenerationModel {
     pub fn new_with_tokenizer(
         generation_config: TextGenerationConfig,
         tokenizer: TokenizerOption,
-    ) -> Result<TextGenerationModel, RustBertError> {
+    ) -> Result<TextGenerationModel<'a>, RustBertError> {
         let (prefix, min_length, max_length) =
             TextGenerationModel::get_prefix_min_max_length(&generation_config);
         let model = TextGenerationOption::new_with_tokenizer(generation_config, tokenizer)?;
@@ -558,7 +558,7 @@ with people, even a bishop, begging for his blessing. <eod> </s> <eos>"
     /// # Ok(())
     /// # }
     /// ```
-    pub fn generate<'a, S>(&self, texts: &[S], prefix: impl Into<Option<&'a str>>) -> Vec<String>
+    pub fn generate<'b, S>(&self, texts: &[S], prefix: impl Into<Option<&'b str>>) -> Vec<String>
     where
         S: AsRef<str> + Sync,
     {

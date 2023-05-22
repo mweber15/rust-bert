@@ -1489,11 +1489,11 @@ pub struct XLNetQuestionAnsweringOutput {
 }
 
 /// # Language generation model based on the XLNet architecture
-pub struct XLNetGenerator {
+pub struct XLNetGenerator<'a> {
     model: XLNetLMHeadModel,
     tokenizer: TokenizerOption,
     var_store: nn::VarStore,
-    generate_config: GenerateConfig,
+    generate_config: GenerateConfig<'a>,
     bos_token_id: Option<i64>,
     eos_token_ids: Option<Vec<i64>>,
     pad_token_id: Option<i64>,
@@ -1503,7 +1503,7 @@ pub struct XLNetGenerator {
     max_position_embeddings: i64,
 }
 
-impl XLNetGenerator {
+impl XLNetGenerator<'_> {
     /// Build a new `XLNetGenerator`
     ///
     /// # Arguments
@@ -1583,7 +1583,7 @@ impl XLNetGenerator {
     }
 }
 
-impl PrivateLanguageGenerator for XLNetGenerator {
+impl PrivateLanguageGenerator for XLNetGenerator<'_> {
     fn _get_tokenizer(&self) -> &TokenizerOption {
         &self.tokenizer
     }
@@ -1782,4 +1782,4 @@ impl PrivateLanguageGenerator for XLNetGenerator {
     }
 }
 
-impl LanguageGenerator for XLNetGenerator {}
+impl LanguageGenerator for XLNetGenerator<'_> {}

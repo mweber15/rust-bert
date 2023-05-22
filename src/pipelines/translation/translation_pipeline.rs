@@ -1065,8 +1065,8 @@ impl TranslationConfig {
     }
 }
 
-impl From<TranslationConfig> for GenerateConfig {
-    fn from(config: TranslationConfig) -> GenerateConfig {
+impl<'a> From<TranslationConfig> for GenerateConfig<'a> {
+    fn from(config: TranslationConfig) -> GenerateConfig<'a> {
         GenerateConfig {
             model_resource: config.model_resource,
             config_resource: config.config_resource,
@@ -1093,19 +1093,19 @@ impl From<TranslationConfig> for GenerateConfig {
 
 #[allow(clippy::large_enum_variant)]
 /// # Abstraction that holds one particular translation model, for any of the supported models
-pub enum TranslationOption {
+pub enum TranslationOption<'a> {
     /// Translator based on Marian model
-    Marian(MarianGenerator),
+    Marian(MarianGenerator<'a>),
     /// Translator based on T5 model
-    T5(T5Generator),
+    T5(T5Generator<'a>),
     /// Translator based on MBart50 model
-    MBart(MBartGenerator),
+    MBart(MBartGenerator<'a>),
     /// Translator based on M2M100 model
-    M2M100(M2M100Generator),
-    NLLB(NLLBGenerator),
+    M2M100(M2M100Generator<'a>),
+    NLLB(NLLBGenerator<'a>),
 }
 
-impl TranslationOption {
+impl TranslationOption<'_> {
     pub fn new(config: TranslationConfig) -> Result<Self, RustBertError> {
         match config.model_type {
             ModelType::Marian => Ok(TranslationOption::Marian(MarianGenerator::new(
@@ -1420,13 +1420,13 @@ impl TranslationOption {
 }
 
 /// # TranslationModel to perform translation
-pub struct TranslationModel {
-    model: TranslationOption,
+pub struct TranslationModel<'a> {
+    model: TranslationOption<'a>,
     supported_source_languages: HashSet<Language>,
     supported_target_languages: HashSet<Language>,
 }
 
-impl TranslationModel {
+impl<'a> TranslationModel<'a> {
     /// Build a new `TranslationModel`
     ///
     /// # Arguments
@@ -1468,7 +1468,9 @@ impl TranslationModel {
     /// # Ok(())
     /// # }
     /// ```
-    pub fn new(translation_config: TranslationConfig) -> Result<TranslationModel, RustBertError> {
+    pub fn new(
+        translation_config: TranslationConfig,
+    ) -> Result<TranslationModel<'a>, RustBertError> {
         let supported_source_languages = translation_config.source_languages.clone();
         let supported_target_languages = translation_config.target_languages.clone();
 
@@ -1536,7 +1538,7 @@ impl TranslationModel {
     pub fn new_with_tokenizer(
         translation_config: TranslationConfig,
         tokenizer: TokenizerOption,
-    ) -> Result<TranslationModel, RustBertError> {
+    ) -> Result<TranslationModel<'a>, RustBertError> {
         let supported_source_languages = translation_config.source_languages.clone();
         let supported_target_languages = translation_config.target_languages.clone();
 

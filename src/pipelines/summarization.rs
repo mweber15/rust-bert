@@ -84,11 +84,11 @@ use crate::{
 /// # Configuration for text summarization
 /// Contains information regarding the model to load, mirrors the GenerationConfig, with a
 /// different set of default parameters and sets the device to place the model on.
-pub struct SummarizationConfig {
+pub struct SummarizationConfig<'a> {
     /// Model type
     pub model_type: ModelType,
     /// Model weights resource (default: pretrained BART model on CNN-DM)
-    pub model_resource: Box<dyn ResourceProvider + Send>,
+    pub model_resource: Box<dyn ResourceProvider + Send + 'a>,
     /// Config resource (default: pretrained BART model on CNN-DM)
     pub config_resource: Box<dyn ResourceProvider + Send>,
     /// Vocab resource (default: pretrained BART model on CNN-DM)
@@ -127,7 +127,7 @@ pub struct SummarizationConfig {
     pub device: Device,
 }
 
-impl SummarizationConfig {
+impl<'a> SummarizationConfig<'a> {
     /// Instantiate a new summarization configuration of the supplied type.
     ///
     /// # Arguments
@@ -143,7 +143,7 @@ impl SummarizationConfig {
         config_resource: RC,
         vocab_resource: RV,
         merges_resource: Option<RV>,
-    ) -> SummarizationConfig
+    ) -> SummarizationConfig<'a>
     where
         RM: ResourceProvider + Send + 'static,
         RC: ResourceProvider + Send + 'static,
@@ -175,8 +175,8 @@ impl SummarizationConfig {
 }
 
 #[cfg(feature = "remote")]
-impl Default for SummarizationConfig {
-    fn default() -> SummarizationConfig {
+impl<'a> Default for SummarizationConfig<'a> {
+    fn default() -> SummarizationConfig<'a> {
         SummarizationConfig::new(
             ModelType::Bart,
             RemoteResource::from_pretrained(BartModelResources::BART_CNN),
@@ -189,8 +189,8 @@ impl Default for SummarizationConfig {
     }
 }
 
-impl From<SummarizationConfig> for GenerateConfig {
-    fn from(config: SummarizationConfig) -> GenerateConfig {
+impl<'a> From<SummarizationConfig<'a>> for GenerateConfig<'a> {
+    fn from(config: SummarizationConfig<'a>) -> GenerateConfig<'a> {
         GenerateConfig {
             model_resource: config.model_resource,
             config_resource: config.config_resource,
@@ -216,21 +216,21 @@ impl From<SummarizationConfig> for GenerateConfig {
 }
 
 /// # Abstraction that holds one particular summarization model, for any of the supported models
-pub enum SummarizationOption {
+pub enum SummarizationOption<'a> {
     /// Summarizer based on BART model
-    Bart(BartGenerator),
+    Bart(BartGenerator<'a>),
     /// Summarizer based on T5 model
-    T5(T5Generator),
+    T5(T5Generator<'a>),
     /// Summarizer based on LongT5 model
-    LongT5(LongT5Generator),
+    LongT5(LongT5Generator<'a>),
     /// Summarizer based on ProphetNet model
-    ProphetNet(ProphetNetConditionalGenerator),
+    ProphetNet(ProphetNetConditionalGenerator<'a>),
     /// Summarizer based on Pegasus model
-    Pegasus(PegasusConditionalGenerator),
+    Pegasus(PegasusConditionalGenerator<'a>),
 }
 
-impl SummarizationOption {
-    pub fn new(config: SummarizationConfig) -> Result<Self, RustBertError> {
+impl<'a> SummarizationOption<'a> {
+    pub fn new(config: SummarizationConfig<'a>) -> Result<Self, RustBertError> {
         match config.model_type {
             ModelType::Bart => Ok(SummarizationOption::Bart(BartGenerator::new(
                 config.into(),
@@ -253,7 +253,7 @@ impl SummarizationOption {
     }
 
     pub fn new_with_tokenizer(
-        config: SummarizationConfig,
+        config: SummarizationConfig<'a>,
         tokenizer: TokenizerOption,
     ) -> Result<Self, RustBertError> {
         match config.model_type {
@@ -349,12 +349,12 @@ impl SummarizationOption {
 }
 
 /// # SummarizationModel to perform summarization
-pub struct SummarizationModel {
-    model: SummarizationOption,
+pub struct SummarizationModel<'a> {
+    model: SummarizationOption<'a>,
     prefix: Option<String>,
 }
 
-impl SummarizationModel {
+impl SummarizationModel<'_> {
     /// Build a new `SummarizationModel`
     ///
     /// # Arguments

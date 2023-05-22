@@ -718,11 +718,11 @@ pub struct T5ModelOutput {
     pub all_encoder_attentions: Option<Vec<Tensor>>,
 }
 
-pub struct T5Generator {
+pub struct T5Generator<'a> {
     model: T5ForConditionalGeneration,
     tokenizer: TokenizerOption,
     var_store: nn::VarStore,
-    generate_config: GenerateConfig,
+    generate_config: GenerateConfig<'a>,
     bos_token_id: Option<i64>,
     eos_token_ids: Option<Vec<i64>>,
     pad_token_id: Option<i64>,
@@ -732,7 +732,7 @@ pub struct T5Generator {
     max_position_embeddings: i64,
 }
 
-impl T5Generator {
+impl T5Generator<'_> {
     pub fn new(generate_config: GenerateConfig) -> Result<T5Generator, RustBertError> {
         let vocab_path = generate_config.vocab_resource.get_local_path()?;
 
@@ -790,7 +790,7 @@ impl T5Generator {
     }
 }
 
-impl PrivateLanguageGenerator for T5Generator {
+impl PrivateLanguageGenerator for T5Generator<'_> {
     fn _get_tokenizer(&self) -> &TokenizerOption {
         &self.tokenizer
     }
@@ -983,4 +983,4 @@ impl PrivateLanguageGenerator for T5Generator {
     }
 }
 
-impl LanguageGenerator for T5Generator {}
+impl LanguageGenerator for T5Generator<'_> {}

@@ -12,9 +12,7 @@
 
 extern crate anyhow;
 
-use rust_bert::bart::{
-    BartConfigResources, BartMergesResources, BartModelResources, BartVocabResources,
-};
+use rust_bert::bart::{BartConfigResources, BartMergesResources, BartVocabResources};
 use rust_bert::pipelines::summarization::{SummarizationConfig, SummarizationModel};
 use rust_bert::resources::RemoteResource;
 use tch::Device;
@@ -29,9 +27,8 @@ fn main() -> anyhow::Result<()> {
     let merges_resource = Box::new(RemoteResource::from_pretrained(
         BartMergesResources::DISTILBART_CNN_6_6,
     ));
-    let model_resource = Box::new(RemoteResource::from_pretrained(
-        BartModelResources::DISTILBART_CNN_6_6,
-    ));
+    let weights = std::fs::read("/home/matt/Downloads/rust_model.ot").unwrap();
+    let model_resource = Box::new(rust_bert::resources::BufferResource { data: &weights });
 
     let summarization_config = SummarizationConfig {
         model_resource,

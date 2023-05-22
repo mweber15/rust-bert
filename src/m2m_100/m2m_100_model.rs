@@ -456,11 +456,11 @@ impl M2M100ForConditionalGeneration {
 }
 
 /// # Language generation model based on the M2M100 architecture
-pub struct M2M100Generator {
+pub struct M2M100Generator<'a> {
     model: M2M100ForConditionalGeneration,
     tokenizer: TokenizerOption,
     var_store: nn::VarStore,
-    generate_config: GenerateConfig,
+    generate_config: GenerateConfig<'a>,
     bos_token_id: Option<i64>,
     eos_token_ids: Option<Vec<i64>>,
     pad_token_id: Option<i64>,
@@ -470,7 +470,7 @@ pub struct M2M100Generator {
     max_position_embeddings: i64,
 }
 
-impl M2M100Generator {
+impl M2M100Generator<'_> {
     /// Build a new `M2M100Generator`
     ///
     /// # Arguments
@@ -582,7 +582,7 @@ impl M2M100Generator {
     }
 }
 
-impl PrivateLanguageGenerator for M2M100Generator {
+impl PrivateLanguageGenerator for M2M100Generator<'_> {
     fn _get_tokenizer(&self) -> &TokenizerOption {
         &self.tokenizer
     }
@@ -791,7 +791,7 @@ impl PrivateLanguageGenerator for M2M100Generator {
     }
 }
 
-impl LanguageGenerator for M2M100Generator {}
+impl LanguageGenerator for M2M100Generator<'_> {}
 
 #[cfg(test)]
 mod test {

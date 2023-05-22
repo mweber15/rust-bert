@@ -591,11 +591,11 @@ pub struct GptNeoModelLMOutput {
 }
 
 /// # Language generation model based on the GPT-Neo architecture
-pub struct GptNeoGenerator {
+pub struct GptNeoGenerator<'a> {
     model: GptNeoForCausalLM,
     tokenizer: TokenizerOption,
     var_store: nn::VarStore,
-    generate_config: GenerateConfig,
+    generate_config: GenerateConfig<'a>,
     bos_token_id: Option<i64>,
     eos_token_ids: Option<Vec<i64>>,
     pad_token_id: Option<i64>,
@@ -605,7 +605,7 @@ pub struct GptNeoGenerator {
     max_position_embeddings: i64,
 }
 
-impl GptNeoGenerator {
+impl GptNeoGenerator<'_> {
     /// Build a new `GPTNeoGenerator`
     ///
     /// # Arguments
@@ -692,7 +692,7 @@ impl GptNeoGenerator {
     }
 }
 
-impl PrivateLanguageGenerator for GptNeoGenerator {
+impl PrivateLanguageGenerator for GptNeoGenerator<'_> {
     fn _get_tokenizer(&self) -> &TokenizerOption {
         &self.tokenizer
     }
@@ -844,4 +844,4 @@ impl PrivateLanguageGenerator for GptNeoGenerator {
     }
 }
 
-impl LanguageGenerator for GptNeoGenerator {}
+impl LanguageGenerator for GptNeoGenerator<'_> {}

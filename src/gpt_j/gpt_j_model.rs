@@ -540,11 +540,11 @@ pub struct GptJModelOutput {
 }
 
 /// # Language generation model based on the GPT-J architecture
-pub struct GptJGenerator {
+pub struct GptJGenerator<'a> {
     model: GptJLMHeadModel,
     tokenizer: TokenizerOption,
     var_store: nn::VarStore,
-    generate_config: GenerateConfig,
+    generate_config: GenerateConfig<'a>,
     bos_token_id: Option<i64>,
     eos_token_ids: Option<Vec<i64>>,
     pad_token_id: Option<i64>,
@@ -554,7 +554,7 @@ pub struct GptJGenerator {
     max_position_embeddings: i64,
 }
 
-impl GptJGenerator {
+impl GptJGenerator<'_> {
     /// Build a new `GptJGenerator`
     ///
     /// # Arguments
@@ -648,7 +648,7 @@ impl GptJGenerator {
     }
 }
 
-impl PrivateLanguageGenerator for GptJGenerator {
+impl PrivateLanguageGenerator for GptJGenerator<'_> {
     fn _get_tokenizer(&self) -> &TokenizerOption {
         &self.tokenizer
     }
@@ -799,4 +799,4 @@ impl PrivateLanguageGenerator for GptJGenerator {
     }
 }
 
-impl LanguageGenerator for GptJGenerator {}
+impl LanguageGenerator for GptJGenerator<'_> {}

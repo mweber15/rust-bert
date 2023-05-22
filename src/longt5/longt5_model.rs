@@ -548,11 +548,11 @@ impl LongT5ForConditionalGeneration {
 /// Container holding a LongT5 model output.
 pub type LongT5ModelOutput = T5ModelOutput;
 
-pub struct LongT5Generator {
+pub struct LongT5Generator<'a> {
     model: LongT5ForConditionalGeneration,
     tokenizer: TokenizerOption,
     var_store: nn::VarStore,
-    generate_config: GenerateConfig,
+    generate_config: GenerateConfig<'a>,
     bos_token_id: Option<i64>,
     eos_token_ids: Option<Vec<i64>>,
     pad_token_id: Option<i64>,
@@ -562,7 +562,7 @@ pub struct LongT5Generator {
     max_position_embeddings: i64,
 }
 
-impl LongT5Generator {
+impl LongT5Generator<'_> {
     pub fn new(generate_config: GenerateConfig) -> Result<LongT5Generator, RustBertError> {
         let vocab_path = generate_config.vocab_resource.get_local_path()?;
 
@@ -620,7 +620,7 @@ impl LongT5Generator {
     }
 }
 
-impl PrivateLanguageGenerator for LongT5Generator {
+impl PrivateLanguageGenerator for LongT5Generator<'_> {
     fn _get_tokenizer(&self) -> &TokenizerOption {
         &self.tokenizer
     }
@@ -815,4 +815,4 @@ impl PrivateLanguageGenerator for LongT5Generator {
     }
 }
 
-impl LanguageGenerator for LongT5Generator {}
+impl LanguageGenerator for LongT5Generator<'_> {}

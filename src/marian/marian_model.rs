@@ -672,11 +672,11 @@ impl MarianForConditionalGeneration {
 }
 
 /// # Language generation model based on the Marian architecture for machine translation
-pub struct MarianGenerator {
+pub struct MarianGenerator<'a> {
     model: MarianForConditionalGeneration,
     tokenizer: TokenizerOption,
     var_store: nn::VarStore,
-    generate_config: GenerateConfig,
+    generate_config: GenerateConfig<'a>,
     bos_token_id: Option<i64>,
     eos_token_ids: Option<Vec<i64>>,
     pad_token_id: Option<i64>,
@@ -686,7 +686,7 @@ pub struct MarianGenerator {
     max_position_embeddings: i64,
 }
 
-impl MarianGenerator {
+impl MarianGenerator<'_> {
     /// Build a new `marianGenerator`
     ///
     /// # Arguments
@@ -803,7 +803,7 @@ impl MarianGenerator {
     }
 }
 
-impl PrivateLanguageGenerator for MarianGenerator {
+impl PrivateLanguageGenerator for MarianGenerator<'_> {
     fn _get_tokenizer(&self) -> &TokenizerOption {
         &self.tokenizer
     }
@@ -1017,4 +1017,4 @@ impl PrivateLanguageGenerator for MarianGenerator {
     }
 }
 
-impl LanguageGenerator for MarianGenerator {}
+impl LanguageGenerator for MarianGenerator<'_> {}

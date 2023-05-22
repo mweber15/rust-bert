@@ -154,8 +154,8 @@ impl Default for ConversationConfig {
     }
 }
 
-impl From<ConversationConfig> for GenerateConfig {
-    fn from(config: ConversationConfig) -> GenerateConfig {
+impl<'a> From<ConversationConfig> for GenerateConfig<'a> {
+    fn from(config: ConversationConfig) -> GenerateConfig<'a> {
         GenerateConfig {
             model_resource: config.model_resource,
             config_resource: config.config_resource,
@@ -692,12 +692,12 @@ impl Default for ConversationManager {
 }
 
 /// # Abstraction that holds one particular conversation model, for any of the supported models
-pub enum ConversationOption {
+pub enum ConversationOption<'a> {
     /// Conversation based on GPT2 model
-    GPT2(GPT2Generator),
+    GPT2(GPT2Generator<'a>),
 }
 
-impl ConversationOption {
+impl ConversationOption<'_> {
     pub fn new(config: ConversationConfig) -> Result<Self, RustBertError> {
         match config.model_type {
             ModelType::GPT2 => Ok(ConversationOption::GPT2(GPT2Generator::new(config.into())?)),
@@ -771,14 +771,14 @@ impl ConversationOption {
 
 /// # Conversation model
 /// Processes a ConversationManager and generate system responses for active conversations.
-pub struct ConversationModel {
-    model: ConversationOption,
+pub struct ConversationModel<'a> {
+    model: ConversationOption<'a>,
     eos_token_id: i64,
     max_allowed_context_length: Option<i64>,
     device: Device,
 }
 
-impl ConversationModel {
+impl<'a> ConversationModel<'a> {
     /// Build a new `ConversationModel`
     ///
     /// # Arguments
@@ -797,7 +797,7 @@ impl ConversationModel {
     /// ```
     pub fn new(
         conversation_config: ConversationConfig,
-    ) -> Result<ConversationModel, RustBertError> {
+    ) -> Result<ConversationModel<'a>, RustBertError> {
         let max_allowed_length = conversation_config
             .max_length
             .map(|max_length| max_length - conversation_config.min_length_for_response);
@@ -840,7 +840,7 @@ impl ConversationModel {
     pub fn new_with_tokenizer(
         conversation_config: ConversationConfig,
         tokenizer: TokenizerOption,
-    ) -> Result<ConversationModel, RustBertError> {
+    ) -> Result<ConversationModel<'a>, RustBertError> {
         let max_allowed_length = conversation_config
             .max_length
             .map(|max_length| max_length - conversation_config.min_length_for_response);
@@ -879,10 +879,10 @@ impl ConversationModel {
     /// # Ok(())
     /// # }
     /// ```
-    pub fn generate_responses<'a>(
+    pub fn generate_responses<'b>(
         &self,
-        conversation_manager: &'a mut ConversationManager,
-    ) -> HashMap<&'a Uuid, &'a str> {
+        conversation_manager: &'b mut ConversationManager,
+    ) -> HashMap<&'b Uuid, &'b str> {
         let (active_uuid, active_conversations) = conversation_manager.get_active_conversations();
         if !active_uuid.is_empty() {
             let texts = active_conversations

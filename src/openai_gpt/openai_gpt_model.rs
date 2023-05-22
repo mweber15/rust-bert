@@ -423,11 +423,11 @@ pub struct OpenAiGptModelOutput {
 }
 
 /// # Language generation model based on the GPT architecture
-pub struct OpenAIGenerator {
+pub struct OpenAIGenerator<'a> {
     model: OpenAIGPTLMHeadModel,
     tokenizer: TokenizerOption,
     var_store: nn::VarStore,
-    generate_config: GenerateConfig,
+    generate_config: GenerateConfig<'a>,
     bos_token_id: Option<i64>,
     eos_token_ids: Option<Vec<i64>>,
     pad_token_id: Option<i64>,
@@ -437,7 +437,7 @@ pub struct OpenAIGenerator {
     max_position_embeddings: i64,
 }
 
-impl OpenAIGenerator {
+impl OpenAIGenerator<'_> {
     /// Build a new `OpenAIGenerator`
     ///
     /// # Arguments
@@ -524,7 +524,7 @@ impl OpenAIGenerator {
     }
 }
 
-impl PrivateLanguageGenerator for OpenAIGenerator {
+impl PrivateLanguageGenerator for OpenAIGenerator<'_> {
     fn _get_tokenizer(&self) -> &TokenizerOption {
         &self.tokenizer
     }
@@ -588,4 +588,4 @@ impl PrivateLanguageGenerator for OpenAIGenerator {
     }
 }
 
-impl LanguageGenerator for OpenAIGenerator {}
+impl LanguageGenerator for OpenAIGenerator<'_> {}

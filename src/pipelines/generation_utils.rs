@@ -93,9 +93,9 @@ use crate::{
 extern crate ordered_float;
 
 /// # Configuration for text generation
-pub struct GenerateConfig {
+pub struct GenerateConfig<'a> {
     /// Model weights resource (default: pretrained GPT2 model)
-    pub model_resource: Box<dyn ResourceProvider + Send>,
+    pub model_resource: Box<dyn ResourceProvider + Send + 'a>,
     /// Config resource (default: pretrained GPT2 model)
     pub config_resource: Box<dyn ResourceProvider + Send>,
     /// Vocab resource (default: pretrained GPT2 model)
@@ -135,8 +135,8 @@ pub struct GenerateConfig {
 }
 
 #[cfg(feature = "remote")]
-impl Default for GenerateConfig {
-    fn default() -> GenerateConfig {
+impl<'a> Default for GenerateConfig<'a> {
+    fn default() -> GenerateConfig<'a> {
         GenerateConfig {
             model_resource: Box::new(RemoteResource::from_pretrained(Gpt2ModelResources::GPT2)),
             config_resource: Box::new(RemoteResource::from_pretrained(Gpt2ConfigResources::GPT2)),
@@ -163,7 +163,7 @@ impl Default for GenerateConfig {
     }
 }
 
-impl GenerateConfig {
+impl<'a> GenerateConfig<'a> {
     pub(crate) fn validate(&self) {
         assert!(self.temperature > 0f64, "temperature must positive");
         assert!(

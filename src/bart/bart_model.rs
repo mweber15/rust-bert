@@ -911,11 +911,11 @@ pub struct BartModelOutput {
 }
 
 /// # Language generation model based on the Bart architecture
-pub struct BartGenerator {
+pub struct BartGenerator<'a> {
     model: BartForConditionalGeneration,
     tokenizer: TokenizerOption,
     var_store: nn::VarStore,
-    generate_config: GenerateConfig,
+    generate_config: GenerateConfig<'a>,
     bos_token_id: Option<i64>,
     eos_token_ids: Option<Vec<i64>>,
     pad_token_id: Option<i64>,
@@ -925,7 +925,7 @@ pub struct BartGenerator {
     max_position_embeddings: i64,
 }
 
-impl BartGenerator {
+impl BartGenerator<'_> {
     /// Build a new `BartGenerator`
     ///
     /// # Arguments
@@ -964,7 +964,9 @@ impl BartGenerator {
     /// # Ok(())
     /// # }
     /// ```
-    pub fn new(generate_config: GenerateConfig) -> Result<BartGenerator, RustBertError> {
+    pub fn new<'a>(
+        generate_config: GenerateConfig<'a>,
+    ) -> Result<BartGenerator<'a>, RustBertError> {
         let vocab_path = generate_config.vocab_resource.get_local_path()?;
         let merges_path = generate_config
             .merges_resource
@@ -1036,7 +1038,7 @@ impl BartGenerator {
     }
 }
 
-impl PrivateLanguageGenerator for BartGenerator {
+impl PrivateLanguageGenerator for BartGenerator<'_> {
     fn _get_tokenizer(&self) -> &TokenizerOption {
         &self.tokenizer
     }
@@ -1248,7 +1250,7 @@ impl PrivateLanguageGenerator for BartGenerator {
     }
 }
 
-impl LanguageGenerator for BartGenerator {}
+impl LanguageGenerator for BartGenerator<'_> {}
 
 #[cfg(test)]
 mod test {

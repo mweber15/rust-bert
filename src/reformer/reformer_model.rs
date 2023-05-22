@@ -1009,11 +1009,11 @@ pub struct ReformerQuestionAnsweringModelOutput {
     pub all_attentions: Option<Vec<Tensor>>,
 }
 
-pub struct ReformerGenerator {
+pub struct ReformerGenerator<'a> {
     model: ReformerModelWithLMHead,
     tokenizer: TokenizerOption,
     var_store: nn::VarStore,
-    generate_config: GenerateConfig,
+    generate_config: GenerateConfig<'a>,
     bos_token_id: Option<i64>,
     eos_token_ids: Option<Vec<i64>>,
     pad_token_id: Option<i64>,
@@ -1023,7 +1023,7 @@ pub struct ReformerGenerator {
     max_position_embeddings: i64,
 }
 
-impl ReformerGenerator {
+impl ReformerGenerator<'_> {
     pub fn new(generate_config: GenerateConfig) -> Result<ReformerGenerator, RustBertError> {
         let vocab_path = generate_config.vocab_resource.get_local_path()?;
 
@@ -1076,7 +1076,7 @@ impl ReformerGenerator {
     }
 }
 
-impl PrivateLanguageGenerator for ReformerGenerator {
+impl PrivateLanguageGenerator for ReformerGenerator<'_> {
     fn _get_tokenizer(&self) -> &TokenizerOption {
         &self.tokenizer
     }
@@ -1207,4 +1207,4 @@ impl PrivateLanguageGenerator for ReformerGenerator {
     }
 }
 
-impl LanguageGenerator for ReformerGenerator {}
+impl LanguageGenerator for ReformerGenerator<'_> {}

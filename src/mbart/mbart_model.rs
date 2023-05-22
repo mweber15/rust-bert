@@ -718,11 +718,11 @@ impl MBartForSequenceClassification {
 pub type MBartModelOutput = BartModelOutput;
 
 /// # Language generation model based on the MBart architecture
-pub struct MBartGenerator {
+pub struct MBartGenerator<'a> {
     model: MBartForConditionalGeneration,
     tokenizer: TokenizerOption,
     var_store: nn::VarStore,
-    generate_config: GenerateConfig,
+    generate_config: GenerateConfig<'a>,
     bos_token_id: Option<i64>,
     eos_token_ids: Option<Vec<i64>>,
     pad_token_id: Option<i64>,
@@ -732,7 +732,7 @@ pub struct MBartGenerator {
     max_position_embeddings: i64,
 }
 
-impl MBartGenerator {
+impl MBartGenerator<'_> {
     /// Build a new `MBartGenerator`
     ///
     /// # Arguments
@@ -835,7 +835,7 @@ impl MBartGenerator {
     }
 }
 
-impl PrivateLanguageGenerator for MBartGenerator {
+impl PrivateLanguageGenerator for MBartGenerator<'_> {
     fn _get_tokenizer(&self) -> &TokenizerOption {
         &self.tokenizer
     }
@@ -1045,7 +1045,7 @@ impl PrivateLanguageGenerator for MBartGenerator {
     }
 }
 
-impl LanguageGenerator for MBartGenerator {}
+impl LanguageGenerator for MBartGenerator<'_> {}
 
 #[cfg(test)]
 mod test {
